@@ -1,6 +1,7 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
+<html lang="ru">
+    <head>
+    <title>Route editor</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#000000" />
@@ -9,10 +10,37 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
     <script src="https://api-maps.yandex.ru/2.1/?apikey=dd75ae82-1ab6-4d71-8756-96db60468032&lang=ru_RU" type="text/javascript">
     </script>
-    <title>Route editor</title>
-</script>
-  </head>
-  <body>
-    <div id="root"></div>
-  </body>
+    <style>
+        html, body, #map {
+            width: 600px; 
+            height: 400px; 
+            padding: 0;
+            margin: 0;
+        }
+
+        ul {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            user-select: none;
+        }
+
+        li {
+            cursor: move;
+            margin: 1px;
+            padding: 5px 20px;
+            font-size: 20px;
+            background-color: #ccc;
+        }
+
+        .ghost {
+            opacity: 0.4;
+        }
+    </style>
+    </head>
+    <body>
+        <div id="root"></div>
+    </body>
 </html>
