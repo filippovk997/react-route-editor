@@ -2,94 +2,76 @@
  * The ListPlacemarks component contains
  * list placemarks names
  */
-import React from 'react';
+import React, { Component } from 'react';
 
 import ItemPlacemark from './ItemPlacemark';
 
+var placeholder = document.createElement('li');
+placeholder.className = "placeholder";
 
-export default function ListPlacemarks(props) {
-    function DragPointOnList(/*name*/) {
-        ////////////////////////////
-        function sortable(rootEl, onUpdate){
-            var dragEl, nextEl;
-            
-            // Делаем всех детей перетаскиваемыми
-            [].slice.call(rootEl.children).forEach(function (itemEl){
-                itemEl.draggable = true;
-            });
-            
-            // Функция отвечающая за сортировку
-            function _onDragOver(evt){
-                evt.preventDefault();
-                evt.dataTransfer.dropEffect = 'move';
-            
-                var target = evt.target;
-                if( target && target !== dragEl && target.nodeName == 'LI' ){
-                    // Сортируем
-                    // Не меняется последний элемент 
-                    rootEl.insertBefore(dragEl, rootEl.children[0] !== target && target.nextSibling || target);
-                }
-            }
-            
-            // Окончание сортировки
-            function _onDragEnd(evt){
-                evt.preventDefault();
-            
-                dragEl.classList.remove('ghost');
-                rootEl.removeEventListener('dragover', _onDragOver, false);
-                rootEl.removeEventListener('dragend', _onDragEnd, false);
-    
-                if( nextEl !== dragEl.nextSibling ){
-                    // Сообщаем об окончании сортировки
-                    // onUpdate(dragEl);
-                }
-    
-                // Записываем новую последовательность в listPoints
-                let ul = document.getElementById('list');
-                let li = ul.children;
-                for (let i = 0; i < ul.children.length; i++) {
-                    props.listPoints[i] = li[i].childNodes[0].textContent;
-                }
-    
-                // pointToPoint();
-                // RenderMap();
-            }
-            
-            // Начало сортировки
-            rootEl.addEventListener('dragstart', function (evt){
-                dragEl = evt.target; // Запоминаем элемент который будет перемещать
-                nextEl = dragEl.nextSibling;
-                
-                // Ограничиваем тип перетаскивания
-                evt.dataTransfer.effectAllowed = 'move';
-                evt.dataTransfer.setData('Text', dragEl.textContent);
-    
-                // Пописываемся на события при dnd
-                rootEl.addEventListener('dragover', _onDragOver, false);
-                rootEl.addEventListener('dragend', _onDragEnd, false);
-    
-                setTimeout(function (){
-                    // Если выполнить данное действие без setTimeout, то
-                    // перетаскиваемый объект, будет иметь этот класс.
-                    dragEl.classList.add('ghost');
-                }, 0)
-            }, false);
-        }
-        
-        // Используем                    
-        sortable( document.getElementById('list'), function (item){
-            console.log(item);
-        });
+class ListPlacemarks extends Component {
+    constructor(props) {
+        super(props);
+        this.state = { list: this.props.listPoints };
+
+        this.dragStart = this.dragStart.bind(this);
+        this.dragEnd = this.dragEnd.bind(this);
+        this.dragOver = this.dragOver.bind(this);
     }
 
-    return (
-        <div className="list-points">
-            <ul id="list">
-                {props.listPoints.map((item) =>
-                    <ItemPlacemark itemName={item}/>
-                )}
+    dragStart(e) {
+        this.dragged = e.currentTarget;
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData("text/html", e.currentTarget);
+    }
+
+    dragEnd(e) {
+        this.dragged.style.display = "block";
+        this.dragged.parentNode.removeChild(placeholder);
+
+        var list = this.state.list;
+        var from = Number(this.dragged.dataset.id);
+        var to = Number(this.over.dataset.id);
+        if(from < to) to--;
+        if(this.nodePlacement == "after") to++;
+        list.splice(to, 0, list.splice(from, 1)[0]); // ? alogrithm
+        this.setState({list: list});
+    }
+
+    dragOver(e) {
+        e.preventDefault();
+        this.dragged.style.display = "none";
+        if(e.target.className == "placeholder") return;
+        this.over = e.target;
+        var relY = e.clientY - this.over.offsetTop;
+        var height = this.over.offsetHeight / 2;
+        var parent = e.target.parentNode;
+        if(relY > height) {
+            this.nodePlacement = "after";
+            parent.insertBefore(placeholder, e.target.nextElementSibling);
+        }
+        else if(relY < height) {
+            this.nodePlacement = "before"
+            parent.insertBefore(placeholder, e.target);
+        }
+    }
+
+    render() {
+        return (
+            <ul onDragOver={this.dragOver}>
+                {this.state.list.map(function(item, i) {
+                    return (
+                        <ItemPlacemark 
+                            itemName={item} 
+                            index={i} 
+                            dragEnd={this.dragEnd} 
+                            dragStart={this.dragStart} 
+                        />
+                    );
+                }, this)}
             </ul>
-            {DragPointOnList}
-        </div>
-    );
+        );
+    }
 }
+
+export default ListPlacemarks;

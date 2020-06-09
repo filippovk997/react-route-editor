@@ -50,29 +50,37 @@ function ymapAddPolyline() {
             strokeOpacity: 0.5
         }
     );
-
     map.geoObjects.add(pl);
 }
 
-export default function App() {
-    const [listPoints, setListPoints] = useState([]);
+export default class App extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = { listPoints: [] };
 
-    function addPoint(name) {
+        this.addPoint = this.addPoint.bind(this);
+    }
+
+    addPoint(name) {
         // add placemark to the map and 
         // its name to the listPoints array
         let pm = createPlacemark(name);
-        map.geoObjects.add(pm);
-        setListPoints(listPoints.concat(name));
         listPlacemarks.push(pm);
-        console.log(listPoints);
+        map.geoObjects.add(pm);
+        let lP = this.state.listPoints;
+        lP.push(name);
+        this.setState({ listPoints: lP });
+        console.log(this.state.listPoints);
 
         ymapAddPolyline();
     }
 
-    return (
-        <>
-            <Map />
-            <Container listPoints={listPoints} addPoint={addPoint} />
-        </>
-    );
+    render() {
+        return (
+            <>
+                <Map />
+                <Container listPoints={this.state.listPoints} addPoint={this.addPoint} />
+            </>
+        );
+    }
 }

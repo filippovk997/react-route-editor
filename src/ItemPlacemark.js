@@ -6,6 +6,14 @@ import React from 'react';
 
 export default function ItemPlacemark(props) {
     return (
-        <li>{props.itemName}</li>
+        <li
+            data-id={props.index}
+            key={props.index}
+            draggable="true"
+            onDragEnd={props.dragEnd}
+            onDragStart={props.dragStart}
+        >
+            {props.itemName}
+        </li>
     );
 }
