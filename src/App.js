@@ -20,6 +20,12 @@ function init(ymaps){
         center: [54.31558342, 48.39393918],
         zoom: 10
     });
+
+    ymapDropPlacemark();
+}
+
+function ymapCleanMap() {
+    map.geoObjects.removeAll();
 }
 
 function createPlacemark(name) {
@@ -35,6 +41,10 @@ function createPlacemark(name) {
     );
 
     return customPlacemark;
+}
+
+function ymapAddPlacemark() {
+    listPlacemarks.map((pm) => map.geoObjects.add(pm));
 }
 
 function ymapAddPolyline() {
@@ -53,12 +63,22 @@ function ymapAddPolyline() {
     map.geoObjects.add(pl);
 }
 
+function ymapDropPlacemark() {
+    map.geoObjects.events.add(['dragend'], function (e) {
+        ymapCleanMap();
+        ymapAddPlacemark();
+        ymapAddPolyline();
+    });
+}
+
 export default class App extends React.Component {
     constructor(props) {
         super(props);
         this.state = { listPoints: [] };
 
         this.addPoint = this.addPoint.bind(this);
+        this.pointsToPlacemarks = this.pointsToPlacemarks.bind(this);
+        this.listPointsSetState = this.listPointsSetState.bind(this);
     }
 
     addPoint(name) {
@@ -66,20 +86,43 @@ export default class App extends React.Component {
         // its name to the listPoints array
         let pm = createPlacemark(name);
         listPlacemarks.push(pm);
-        map.geoObjects.add(pm);
         let lP = this.state.listPoints;
         lP.push(name);
         this.setState({ listPoints: lP });
         console.log(this.state.listPoints);
 
+        ymapCleanMap();
+        ymapAddPlacemark();
         ymapAddPolyline();
+    }
+
+    listPointsSetState(listPoints) {
+        this.setState({ listPoints: listPoints });
+        this.pointsToPlacemarks();
+        ymapCleanMap();
+        ymapAddPlacemark();
+        ymapAddPolyline();
+    }
+
+    pointsToPlacemarks() {
+        let list_placemarks = [];
+        let list_points = this.state.listPoints;
+        for (let i = 0; i < list_points.length; i++) {
+            for (let j = 0; j < listPlacemarks.length; j++) {
+                // !warning: poor search results for identical values in the list
+                if (listPlacemarks[j].properties._data.balloonContent == list_points[i]) {
+                    list_placemarks.push(listPlacemarks[j]);
+                }
+            }
+        }
+        listPlacemarks = list_placemarks;
     }
 
     render() {
         return (
             <>
                 <Map />
-                <Container listPoints={this.state.listPoints} addPoint={this.addPoint} />
+                <Container listPoints={this.state.listPoints} listPointsSetState={this.listPointsSetState} addPoint={this.addPoint} />
             </>
         );
     }

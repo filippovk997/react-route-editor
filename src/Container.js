@@ -12,7 +12,7 @@ export default function Container(props) {
     return (
         <>
             <Header listPoints={props.listPoints} addPoint={props.addPoint} />
-            <ListPlacemarks listPoints={props.listPoints} />
+            <ListPlacemarks listPoints={props.listPoints} listPointsSetState={props.listPointsSetState} />
         </>
     );
 }

@@ -34,8 +34,9 @@ class ListPlacemarks extends Component {
         var to = Number(this.over.dataset.id);
         if(from < to) to--;
         if(this.nodePlacement == "after") to++;
-        list.splice(to, 0, list.splice(from, 1)[0]); // ? alogrithm
+        list.splice(to, 0, list.splice(from, 1)[0]); // ? algorithm
         this.setState({list: list});
+        this.props.listPointsSetState(list);
     }
 
     dragOver(e) {
