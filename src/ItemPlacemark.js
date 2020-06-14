@@ -8,7 +8,6 @@ export default function ItemPlacemark(props) {
     return (
         <li
             data-id={props.index}
-            key={props.index}
             draggable="true"
             onDragEnd={props.dragEnd}
             onDragStart={props.dragStart}
