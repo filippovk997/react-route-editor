@@ -4,10 +4,11 @@
  * and its children Map and Container
  * components
  */
-import React, { useState } from 'react';
+import React from 'react';
 
-import Map from './Map'
-import Container from './Container';
+import Map from './Map';
+import Header from './Header';
+import ListPlacemarks from './ListPlacemarks';
 
 let listPlacemarks = [];
 
@@ -122,7 +123,8 @@ export default class App extends React.Component {
         return (
             <>
                 <Map />
-                <Container listPoints={this.state.listPoints} listPointsSetState={this.listPointsSetState} addPoint={this.addPoint} />
+                <Header addPoint={this.addPoint} />
+                <ListPlacemarks listPoints={this.state.listPoints} listPointsSetState={this.listPointsSetState} />
             </>
         );
     }
