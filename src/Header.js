@@ -10,14 +10,13 @@ export default function Header(props) {
     const [pointText, setPointText] = useState("");
 
     function handleChangeInput(event) {
-        setPointText(event.target.pointText);
+        setPointText(event.target.value);
     }
 
     function onKeyPressEnter(event) {
         if (event.key === "Enter") {
+            setPointText("");
             props.addPoint(event.target.value);
-            let input = document.getElementById('input-point');
-            input.value = "";
         }
     }
 

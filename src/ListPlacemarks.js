@@ -33,7 +33,7 @@ class ListPlacemarks extends Component {
         var from = Number(this.dragged.dataset.id);
         var to = Number(this.over.dataset.id);
         if(from < to) to--; // if the placeholder is higher than the over element
-        if(this.nodePlacement == "after") to++; // if the placeholder is lower than the over element
+        if(this.nodePlacement === "after") to++; // if the placeholder is lower than the over element
 
         list.splice(to, 0, list.splice(from, 1)[0]); // dragged element from from place is inserted 
                                                      // in to place
@@ -44,7 +44,7 @@ class ListPlacemarks extends Component {
     dragOver(e) {
         e.preventDefault();
         this.dragged.style.display = "none";
-        if (e.target.className == "placeholder") 
+        if (e.target.className === "placeholder") 
             return;
         this.over = e.target;
         var relY = e.clientY - this.over.offsetTop; // difference between the user's mouse pointer and 
