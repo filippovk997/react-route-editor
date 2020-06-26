@@ -1,7 +1,3 @@
-/**
- * The ListPlacemarks component contains
- * list placemarks names
- */
 import React, { Component } from 'react';
 
 import ItemPlacemark from './ItemPlacemark';
@@ -12,7 +8,7 @@ placeholder.className = "placeholder";
 class ListPlacemarks extends Component {
     constructor(props) {
         super(props);
-        this.state = { list: this.props.listPoints };
+        this.state = { listItems: this.props.listItems };
 
         this.dragStart = this.dragStart.bind(this);
         this.dragEnd = this.dragEnd.bind(this);
@@ -29,16 +25,20 @@ class ListPlacemarks extends Component {
         this.dragged.style.display = "block";
         this.dragged.parentNode.removeChild(placeholder);
 
-        var list = this.state.list;
-        var from = Number(this.dragged.dataset.id);
-        var to = Number(this.over.dataset.id);
-        if(from < to) to--; // if the placeholder is higher than the over element
-        if(this.nodePlacement === "after") to++; // if the placeholder is lower than the over element
+        var listItems = this.state.listItems;
+        var from = Number(this.dragged.dataset.position);
+        var to = Number(this.over.dataset.position);
+        // if the placeholder is higher than the over element
+        if(from < to) to--; 
+        // if the placeholder is lower than the over element
+        if(this.nodePlacement === "after") to++; 
 
-        list.splice(to, 0, list.splice(from, 1)[0]); // dragged element from from place is inserted 
-                                                     // in to place
-        this.setState({list: list});
-        this.props.listPointsSetState(list);
+        // dragged element from from place is inserted in to place
+        listItems.splice(to, 0, listItems.splice(from, 1)[0]);
+        this.setState({ listItems: listItems });
+
+        listItems.map((item, i) => item.position = i);
+        this.props.setListItems(listItems);
     }
 
     dragOver(e) {
@@ -65,11 +65,12 @@ class ListPlacemarks extends Component {
     render() {
         return (
             <ul onDragOver={this.dragOver}>
-                {this.state.list.map(function(item, i) {
+                {this.state.listItems.map(function(item, i) {
                     return (
                         <ItemPlacemark
-                            key={i}
-                            itemName={item} 
+                            key={item.id}
+                            id={item.id}
+                            itemName={item.name} 
                             index={i} 
                             dragEnd={this.dragEnd} 
                             dragStart={this.dragStart} 

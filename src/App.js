@@ -1,16 +1,10 @@
-/**
- * The main application component
- * contains data from Yandex.Maps 
- * and its children Map and Container
- * components
- */
 import React from 'react';
 
 import Map from './Map';
 import Header from './Header';
 import ListPlacemarks from './ListPlacemarks';
 
-let listPlacemarks = [];
+let listItems_ = [];
 
 window.ymaps.ready(init);
 
@@ -23,10 +17,6 @@ function init(ymaps){
     });
 
     ymapDropPlacemark();
-}
-
-function ymapCleanMap() {
-    map.geoObjects.removeAll();
 }
 
 function createPlacemark(name) {
@@ -44,87 +34,119 @@ function createPlacemark(name) {
     return customPlacemark;
 }
 
-function ymapAddPlacemark() {
-    listPlacemarks.map((pm) => map.geoObjects.add(pm));
-}
-
-function ymapAddPolyline() {
-    // create and add polyline to the map
-    var pl = new window.ymaps.Polyline(
-        listPlacemarks.map(
-            pm => {
-                return pm.geometry._coordinates;
-            })
-        , {}, {
-            strokeColor: "#000000",
-            strokeWidth: 4,
-            strokeOpacity: 0.5
-        }
-    );
-    map.geoObjects.add(pl);
-}
-
 function ymapDropPlacemark() {
     map.geoObjects.events.add(['dragend'], function (e) {
-        ymapCleanMap();
-        ymapAddPlacemark();
-        ymapAddPolyline();
+        map.geoObjects.removeAll();
+        
+        let items_coordinates = listItems_.map((item) => {
+            map.geoObjects.add(item.placemark);
+
+            return item.coordinates;
+        });
+
+        let polyline = new window.ymaps.Polyline(
+            items_coordinates
+            , {}, {
+                strokeColor: "#000000",
+                strokeWidth: 4,
+                strokeOpacity: 0.5
+            }
+        );
+        map.geoObjects.add(polyline);
     });
+}
+
+class Item {
+    constructor(name) {
+        this._name = name;
+        this._position = 0;
+        this._coordinates = map.getCenter();
+        this._placemark = {};
+        this._id = Item.createId();
+    }
+    static idCount = 0;
+
+    get name() {
+        return this._name;
+    }
+
+    get id() {
+        return this._id;
+    }
+
+    get coordinates() {
+        return this._placemark.geometry._coordinates;
+    }
+
+    get placemark() {
+        return this._placemark;
+    }
+
+    set position(pos) {
+        this._position = pos;
+    }
+
+    set placemark(pm) {
+        this._placemark = pm;
+    }
+
+    static createId() {
+        Item.idCount++;
+        return Item.idCount;
+    }
 }
 
 export default class App extends React.Component {
     constructor(props) {
         super(props);
-        this.state = { listPoints: [] };
+        this.state = { listItems: [] };
 
-        this.addPoint = this.addPoint.bind(this);
-        this.pointsToPlacemarks = this.pointsToPlacemarks.bind(this);
-        this.listPointsSetState = this.listPointsSetState.bind(this);
+        this.addItem = this.addItem.bind(this);
+        this.setListItems = this.setListItems.bind(this);
     }
 
-    addPoint(name) {
-        // add placemark to the map and 
-        // its name to the listPoints array
+    addItem(name) {
+        let item = new Item(name);
         let pm = createPlacemark(name);
-        listPlacemarks.push(pm);
-        let lP = this.state.listPoints;
-        lP.push(name);
-        this.setState({ listPoints: lP });
-        console.log(this.state.listPoints);
-
-        ymapCleanMap();
-        ymapAddPlacemark();
-        ymapAddPolyline();
+        item.placemark = pm;
+        item.position = this.state.listItems.length;
+        
+        let list_items = this.state.listItems;
+        list_items.push(item);
+        this.setListItems(list_items);
+        console.log("this.state.listItems", this.state.listItems);
     }
 
-    listPointsSetState(listPoints) {
-        this.setState({ listPoints: listPoints });
-        this.pointsToPlacemarks();
-        ymapCleanMap();
-        ymapAddPlacemark();
-        ymapAddPolyline();
-    }
+    setListItems(listItems) {
+        this.setState({ listItems: listItems });
 
-    pointsToPlacemarks() {
-        let list_placemarks = [];
-        let list_points = this.state.listPoints;
-        for (let i = 0; i < list_points.length; i++) {
-            for (let j = 0; j < listPlacemarks.length; j++) {
-                // !warning: poor search results for identical values in the list
-                if (listPlacemarks[j].properties._data.balloonContent == list_points[i]) {
-                    list_placemarks.push(listPlacemarks[j]);
-                }
+        listItems_ = this.state.listItems;
+
+        map.geoObjects.removeAll();
+
+        let items_coordinates = this.state.listItems.map((item) => {
+            map.geoObjects.add(item.placemark);
+
+            return item.coordinates;
+        });
+
+        let polyline = new window.ymaps.Polyline(
+            items_coordinates
+            , {}, {
+                strokeColor: "#000000",
+                strokeWidth: 4,
+                strokeOpacity: 0.5
             }
-        }
-        listPlacemarks = list_placemarks;
+        );
+        map.geoObjects.add(polyline);
     }
 
     render() {
         return (
             <>
                 <Map />
-                <Header addPoint={this.addPoint} />
-                <ListPlacemarks listPoints={this.state.listPoints} listPointsSetState={this.listPointsSetState} />
+                <Header addItem={this.addItem} />
+                <ListPlacemarks listItems={this.state.listItems} setListItems={this.setListItems} />
             </>
         );
     }
