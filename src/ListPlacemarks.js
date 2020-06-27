@@ -8,7 +8,6 @@ placeholder.className = "placeholder";
 class ListPlacemarks extends Component {
     constructor(props) {
         super(props);
-        this.state = { listItems: this.props.listItems };
 
         this.dragStart = this.dragStart.bind(this);
         this.dragEnd = this.dragEnd.bind(this);
@@ -25,7 +24,7 @@ class ListPlacemarks extends Component {
         this.dragged.style.display = "block";
         this.dragged.parentNode.removeChild(placeholder);
 
-        var listItems = this.state.listItems;
+        var listItems = this.props.listItems;
         var from = Number(this.dragged.dataset.position);
         var to = Number(this.over.dataset.position);
         // if the placeholder is higher than the over element
@@ -35,7 +34,6 @@ class ListPlacemarks extends Component {
 
         // dragged element from from place is inserted in to place
         listItems.splice(to, 0, listItems.splice(from, 1)[0]);
-        this.setState({ listItems: listItems });
 
         listItems.map((item, i) => item.position = i);
         this.props.setListItems(listItems);
@@ -65,13 +63,14 @@ class ListPlacemarks extends Component {
     render() {
         return (
             <ul onDragOver={this.dragOver}>
-                {this.state.listItems.map(function(item, i) {
+                {this.props.listItems.map((item, i) => {
                     return (
                         <ItemPlacemark
                             key={item.id}
                             id={item.id}
                             itemName={item.name} 
                             index={i} 
+                            removeItem={this.props.removeItem}
                             dragEnd={this.dragEnd} 
                             dragStart={this.dragStart} 
                         />

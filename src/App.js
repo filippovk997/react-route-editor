@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Component } from 'react';
 
 import Map from './Map';
 import Header from './Header';
@@ -96,12 +96,13 @@ class Item {
     }
 }
 
-export default class App extends React.Component {
+class App extends Component {
     constructor(props) {
         super(props);
         this.state = { listItems: [] };
 
         this.addItem = this.addItem.bind(this);
+        this.removeItem = this.removeItem.bind(this);
         this.setListItems = this.setListItems.bind(this);
     }
 
@@ -114,12 +115,24 @@ export default class App extends React.Component {
         let list_items = this.state.listItems;
         list_items.push(item);
         this.setListItems(list_items);
-        console.log("this.state.listItems", this.state.listItems);
+    }
+
+    removeItem(id) {
+        let list_items = this.state.listItems;
+        let i;
+        for (i = 0; i < list_items.length; i++) {
+            if (list_items[i].id === id) {
+                break;
+            }
+        }
+        list_items.splice(i, 1);
+        this.setListItems(list_items);
     }
 
     setListItems(listItems) {
         this.setState({ listItems: listItems });
 
+        // for drop placemarks on map
         listItems_ = this.state.listItems;
 
         map.geoObjects.removeAll();
@@ -146,8 +159,14 @@ export default class App extends React.Component {
             <>
                 <Map />
                 <Header addItem={this.addItem} />
-                <ListPlacemarks listItems={this.state.listItems} setListItems={this.setListItems} />
+                <ListPlacemarks 
+                    listItems={this.state.listItems} 
+                    setListItems={this.setListItems} 
+                    removeItem={this.removeItem} 
+                />
             </>
         );
     }
 }
+
+export default App;

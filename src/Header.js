@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-export default function Header(props) {
+function Header(props) {
     const [inputText, setInputText] = useState("");
 
     function handleChangeInput(event) {
@@ -30,3 +30,5 @@ export default function Header(props) {
         />
     );
 }
+
+export default Header;
