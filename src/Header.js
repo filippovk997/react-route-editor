@@ -22,7 +22,7 @@ function Header(props) {
             id="input-point" 
             type="text" 
             name="enter" 
-            placeholder="Новая точка маршрута"
+            placeholder="Введите новую точку маршрута"
             value={inputText} 
             onChange={handleChangeInput}
             onKeyPress={onKeyPressEnter}

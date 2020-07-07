@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import Map from './Map';
 import Header from './Header';
 import ListPlacemarks from './ListPlacemarks';
+import './App.css';
 
 let listItems_ = [];
 
@@ -158,12 +159,16 @@ class App extends Component {
         return (
             <>
                 <Map />
-                <Header addItem={this.addItem} />
-                <ListPlacemarks 
-                    listItems={this.state.listItems} 
-                    setListItems={this.setListItems} 
-                    removeItem={this.removeItem} 
-                />
+                <div id="router">
+                    <Header addItem={this.addItem} />
+                    <div id="list-points">
+                        <ListPlacemarks 
+                            listItems={this.state.listItems} 
+                            setListItems={this.setListItems} 
+                            removeItem={this.removeItem} 
+                        />
+                    </div>
+                </div>
             </>
         );
     }
